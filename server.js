@@ -1,9 +1,10 @@
-// server.js
 const express = require('express');
-const bodyParser = require('body-parser'); // برای پردازش داده‌های JSON
+const bodyParser = require('body-parser');
+const cors = require('cors'); // Import CORS
 const app = express();
 const PORT = 3000;
 
+app.use(cors());
 // Middleware برای پردازش body به فرمت JSON
 app.use(bodyParser.json());
 
@@ -47,21 +48,17 @@ const checkAuth = (req, res, next) => {
     next();
 };
 
-// API endpoint to get contacts
 app.get('/api/contacts', checkAuth, (req, res) => {
     return res.json({ data: contacts });
 });
 
 // API endpoint to create a new contact
 app.post('/api/contacts/create', checkAuth, (req, res) => {
-    const { name, email, tel1, tel2, address, comment } = req.body; // دریافت داده‌ها از req.body
-
-    // اعتبارسنجی پارامترها
+    const { name, email, tel1, tel2, address, comment } = req.body;
     if (!name || !email) {
         return res.status(400).json({ error: 'Bad Request: Missing parameters' });
     }
 
-    // ایجاد یک مخاطب جدید
     const newContact = {
         id: contacts.length + 1,
         name,
@@ -69,8 +66,9 @@ app.post('/api/contacts/create', checkAuth, (req, res) => {
         tel1,
         tel2,
         address,
+        comment,
     };
-    contacts.push(newContact); // اضافه کردن مخاطب جدید به آرایه
+    contacts.push(newContact);
     res.status(201).json({
         message: 'Contact created successfully',
         data: newContact
